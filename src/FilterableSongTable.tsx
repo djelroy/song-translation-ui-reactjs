@@ -42,8 +42,8 @@ class SongTable extends React.Component<SongProps, any>{
         const songRows: any = [];
         const searchText = this.props.searchText;
         
-        { 
-            this.props.songs.forEach((song: Song) =>
+        
+            this.props.songs.forEach((song: Song) => {
                 if(song.title.includes(searchText)) {
                     songRows.push(
                         <SongRow title={song.title} artist={song.artist} lyrics={song.lyrics}/>
@@ -61,7 +61,7 @@ class SongTable extends React.Component<SongProps, any>{
     }   
 }
 
-class SongSearchBar extends React.Component<any> {
+class SongSearchBar extends React.Component<any, any> {
     constructor(props: any){
         super(props);  
         this.handleSearchTextChange = this.handleSearchTextChange.bind(this);
