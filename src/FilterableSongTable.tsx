@@ -9,6 +9,12 @@ interface Song {
 
 interface SongProps {
     songs: Song[];
+    searchText: string;
+}
+
+interface SongState {
+    searchText: string;
+    isOnlyWithTranslation: boolean
 }
 
 function SongHeader() {
@@ -33,8 +39,18 @@ function SongRow(props: Song) {
 
 class SongTable extends React.Component<SongProps, any>{
     render(){
-        const songRows = this.props.songs.map(song => 
-            <SongRow title={song.title} artist={song.artist} lyrics={song.lyrics}/>);
+        const songRows: any = [];
+        const searchText = this.props.searchText;
+        
+        { 
+            this.props.songs.forEach((song: Song) =>
+                if(song.title.includes(searchText)) {
+                    songRows.push(
+                        <SongRow title={song.title} artist={song.artist} lyrics={song.lyrics}/>
+                    );   
+                }
+            }
+        );
 
         return (          
             <table style={{border: '1px solid black'}}>
@@ -45,25 +61,65 @@ class SongTable extends React.Component<SongProps, any>{
     }   
 }
 
-class SongSearchBar extends React.Component {
+class SongSearchBar extends React.Component<any> {
+    constructor(props: any){
+        super(props);  
+        this.handleSearchTextChange = this.handleSearchTextChange.bind(this);
+        this.handleIsOnlyWithTranslation = this.handleIsOnlyWithTranslation.bind(this);
+    }
+
+    handleSearchTextChange(e: any){
+        this.props.onHandleSearchTextChange(e.target.value);
+    }
+
+    handleIsOnlyWithTranslation(e: any){
+        this.props.onHandleOnlyWithTranslationChange(e.target.value);
+    }
+
     render(){
+        const isOnlyWithTranslation = this.props.isOnlyWithTranslation;
+        const searchText = this.props.searchText;
+         
         return (
             <form>
-                <input type="text" placeholder="Search..."/>
+                <input type="text" placeholder="Search..." value={searchText} onChange={this.handleSearchTextChange}/>
                 <p>
-                    <input type="checkbox" />
+                    <input type="checkbox" checked={isOnlyWithTranslation} />
                     Only with translations
                 </p>
             </form>            
         );
     }
 }
-export default class FilterableSongTable extends React.Component<SongProps, any> {
+export default class FilterableSongTable extends React.Component<{songs: Song[]}, SongState> {
+    constructor(props: SongProps){
+        super(props);
+        this.state = {
+            searchText: '', 
+            isOnlyWithTranslation: false
+        };
+
+        this.handleSearchTextChange = this.handleSearchTextChange.bind(this);
+        this.handleOnlyWithTranslationChange = this.handleOnlyWithTranslationChange.bind(this);
+    }
+
+    handleSearchTextChange(searchText: string){
+        this.setState({searchText: searchText});
+    }
+
+    handleOnlyWithTranslationChange(isOnlyWithTranslation: boolean){
+        this.setState({isOnlyWithTranslation: isOnlyWithTranslation});
+    }
     render(){
         return (
             <div>
-                <SongSearchBar />
-                <SongTable songs={this.props.songs} />
+                <SongSearchBar 
+                    isOnlyWithTranslation={this.state.isOnlyWithTranslation} 
+                    searchText={this.state.searchText}
+                    onHandleSearchTextChange={this.handleSearchTextChange}
+                    onHandleOnlyWithTranslationChange={this.handleOnlyWithTranslationChange}
+                    />
+                <SongTable songs={this.props.songs} searchText={this.state.searchText}/>
             </div>            
         );
     }
