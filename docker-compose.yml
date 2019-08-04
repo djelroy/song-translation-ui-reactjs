@@ -1,0 +1,43 @@
+version: "3"
+services:
+  songdb:
+    image: djelroy/song-translation-api:mysql-data
+    environment:
+      MYSQL_DATABASE: song_translation_db
+      MYSQL_USER: songapi
+      MYSQL_PASSWORD: songapipwd
+      MYSQL_ROOT_PASSWORD: supersecret
+    ports:
+      - 3306:3306
+    volumes:
+      - "mysql:/var/lib/mysql"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+  songserver:
+    image: djelroy/song-translation-api:web-rest-dev-july2019
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 8080:8080
+    depends_on:
+      - songdb
+  ui-client:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 80:80
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+
+      
+volumes:
+  mysql:
