@@ -1,10 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Link } from "react-router-dom";
+import DeleteSong from "./DeleteSong";
+
 
 interface Song {
     title: string;
     artist: string;
     lyrics: string;
+    id? :number;
 }
 
 interface SongProps {
@@ -32,6 +36,7 @@ function SongHeader() {
             <td>Title</td>
             <td>Artist</td>
             <td>Lyrics</td>
+            <td></td>
         </tr>
     );
 }
@@ -42,11 +47,13 @@ function SongRow(props: Song) {
             <td>{props.title}</td>
             <td>{props.artist}</td>
             <td>{props.lyrics}</td>
+            <td><DeleteSong id={props.id}/></td>
         </tr>
     );   
 }
 
 class SongTable extends React.Component<SongProps, any>{
+    
     render(){
         const songRows: any = [];
         const searchText = this.props.searchText;
@@ -55,8 +62,10 @@ class SongTable extends React.Component<SongProps, any>{
             this.props.songs.forEach((song: Song) => {
                 if(song.title.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())) {
                     songRows.push(
-                        <SongRow title={song.title} artist={song.artist} lyrics={song.lyrics}/>
-                    );   
+                        <SongRow title={song.title} artist={song.artist} lyrics={song.lyrics} id={song.id!}/>
+                        
+                    ); 
+                    
                 }
             }
         );
